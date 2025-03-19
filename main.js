@@ -6,7 +6,13 @@ console.log("Electron - Processo principal")
 //nativeTheme (definir tema claro ou escuro)
 //Menu (definir um menu personalizado )
 //shell (acessar links externos no navegador padrão)
-const { app, BrowserWindow, nativeTheme, Menu, shell } = require('electron/main')
+const { app, BrowserWindow, nativeTheme, Menu, shell, ipcMain} = require('electron/main')
+
+//Ativação do preload.js (importação do path)
+const path = require('node:path')
+
+// Importação dos métodos conectar e desconectar (módulo de conexão)
+const {conectar, desconectar} = require('./database.js')
 
 //Janela principal
 let win
@@ -21,6 +27,9 @@ const createWindow = () => {
     //minimizable: false,
     //closable: false,
     //autoHideMenuBar: true
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
   })
 
   // Carregar o menu personalizado 
@@ -59,6 +68,19 @@ function aboutWindow() {
 app.whenReady().then(() => {
   createWindow()
 
+  // Melhor local para estabelecer a conexão com o banco de dados 
+  // No MongoDB é mais eficiente manter uma única conexão abertadurante todo o tempo de vida do aplicativo e encerrar a conexão 
+  //quando o aplicativo dor finalizado 
+  ipcMain.on('db-connect', async (event) => {
+    //a linha abaixo estabelece a conexão com o banco de dados 
+    await conectar()
+    // enviar ao rendirizador uma menssagem para trocar a imagem do icone do banco de dados (criar um delay 0.5 ou 1s para sincronização com a nuvem )
+    setTimeout(() =>{
+      // enviar ao renderizador a mensagem "connectado"
+      // db-status (IPC - comunicação entre processos - preload.js)
+      event.reply('db-status', "conectado")
+    }, 500) // 500ms = 0.5s
+  }) 
 
   // só ativar a janela principal se nenhuma outra outra estiver ativa
   app.on('activate', () => {
@@ -75,6 +97,10 @@ app.on('window-all-closed', () => {
   }
 })
 
+// IMPORTANTE! Desconectar do banco de dados quando a aplicação  for finalizada
+app.on('before-quit', async () => {
+  await desconectar()
+})
 // Reduzir a verbozidade de logs não criticas (devetools)
 app.commandLine.appendSwitch('log-level','3')
 
@@ -115,6 +141,10 @@ const template = [
       },
       {
         type: 'separator'
+      },
+      {
+        label: 'Recarregar',
+        role: 'reload'
       },
       {
         label: 'DevTools',
