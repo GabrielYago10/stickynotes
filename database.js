@@ -25,8 +25,10 @@ const conectar = async () => {
             await mongoose.connect(url) // conectar
             conectado = true // setar a variável
             console.log("MongoDB Connect")
+            return true
         } catch (error) {
             console.error(error)
+            return false
         }
     }
 }
@@ -40,8 +42,10 @@ const desconectar = async () => {
             await mongoose.disconnect(url) // desconectar
             conectado = false // setar a variável
             console.log("MongoDB Desconnect")
+            return true
         } catch (error) {
             console.error(error)
+            return false 
         }
     }
 }
