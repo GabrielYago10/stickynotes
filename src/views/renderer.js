@@ -1,5 +1,5 @@
 /**
- *  Processo de renderização do documento inde.html
+ *  Processo de renderização do documento index.html
  */
  console.log("Processo de renderização")
 
