@@ -37,5 +37,19 @@ frmNote.addEventListener('submit', (event) => {
 
 })
 
-// == Fim - CRUD Create ====================================
-// =========================================================
+// == Fim - CRUD Create ============================
+// =================================================
+ 
+ 
+// =================================================
+// == Resetar o formulário =========================
+ 
+api.resetForm((args) => {
+    // recarregar a página
+    location.reload()
+    // recarregar a página principal(atualizar notas)
+    api.updateList()
+})
+ 
+// == Fim - Resetar o formulário ===================
+// =================================================
