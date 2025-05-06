@@ -167,10 +167,7 @@ app.commandLine.appendSwitch('log-level', '3')
   }
 ]
  
-ipcMain.on('create-note', async (event, stickyNote) => {
- 
-  console.log(stickyNote)
-  
+ipcMain.on('create-note', async (event, stickyNote) => { 
   try {
     const newNote = noteModel({
       texto: stickyNote.textNote,
@@ -187,7 +184,6 @@ ipcMain.on('create-note', async (event, stickyNote) => {
 ipcMain.on('list-notes', async (event) => {
   try {
     const notes = await noteModel.find()
-    console.log(notes)
     event.reply('render-notes', JSON.stringify(notes))
   } catch (error) {
     console.log(error)
@@ -208,7 +204,6 @@ function updateList() {
 }
  
 ipcMain.on('delete-note', async (event, id) => {
-  console.log(id)
   const result = await dialog.showMessageBox(win, {
     type: 'warning',
     title: "Atenção!",
